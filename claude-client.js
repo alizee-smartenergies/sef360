@@ -13,42 +13,30 @@ async function handleDocumentUpload(input) {
           payload: {
             model: 'claude-sonnet-4-20250514',
             max_tokens: 1024,
-            messages: [{
-              role: 'user',
-              content: 'Génère un exemple de données de facture énergie en JSON avec ces champs: {"fournisseur":"EDF Pro","periode":"Février 2026","montant_ttc":1450,"consommation_kwh":12500,"prix_kwh":0.116,"anomalies":["Puissance surdimensionnée"]}'
-            }]
+            messages: [{ role: 'user', content: 'Reponds UNIQUEMENT en JSON sans markdown: {"fournisseur":"EDF Pro","periode":"Fevrier 2026","montant_ttc":1450,"consommation_kwh":12500,"prix_kwh":0.116,"anomalies":["Puissance surdimensionnee"]}' }]
           }
         })
       });
       var data = await response.json();
+      console.log('Claude response:', data);
       if (data.content && data.content[0]) {
         var text = data.content[0].text;
-        var clean = console.log('Réponse Claude brute:', text);text.replace(/```json|```/g,'').trim();
-        var result = JSON.parse(clean);
+        console.log('Claude text:', text);
+        var result = JSON.parse(text.trim());
         if (currentClientId && SEF_CLIENTS[currentClientId]) {
           var c = SEF_CLIENTS[currentClientId];
-          if (result.montant_ttc) { c.facture = result.montant_ttc.toLocaleString('fr-FR') + ' €'; c.kpi_facture = result.montant_ttc; }
-          if (result.consommation_kwh) { c.conso = result.consommation_kwh.toLocaleString('fr-FR') + ' kWh'; c.kpi_conso = result.consommation_kwh + ' kWh'; }
-          if (result.prix_kwh) { c.kpi_prix = result.prix_kwh; }
+          if (result.montant_ttc) { c.facture = result.montant_ttc.toLocaleString('fr-FR') + ' €'; }
+          if (result.consommation_kwh) { c.conso = result.consommation_kwh.toLocaleString('fr-FR') + ' kWh'; }
           saveClients();
-          renderKpisDisplay();
-          var $t = function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
-          $t('d-facture', c.facture);
-          $t('d-conso', c.conso);
+          var el1 = document.getElementById('d-facture');
+          var el2 = document.getElementById('d-conso');
+          if (el1) el1.textContent = c.facture;
+          if (el2) el2.textContent = c.conso;
         }
         var zone = document.getElementById('upload-result');
         if (zone) {
           zone.style.display = 'block';
-          zone.innerHTML = '<div style="padding:16px;background:rgba(163,230,53,0.06);border:1px solid rgba(163,230,53,0.2);border-radius:8px">'
-            + '<div style="font-size:12px;font-weight:600;color:var(--volt);margin-bottom:8px">✅ Analyse Claude terminée</div>'
-            + '<div style="font-size:12px;color:var(--text1);line-height:1.8">'
-            + '📋 Fournisseur : <strong>' + (result.fournisseur||'—') + '</strong><br>'
-            + '📅 Période : <strong>' + (result.periode||'—') + '</strong><br>'
-            + '💶 Montant TTC : <strong>' + (result.montant_ttc||'—') + ' €</strong><br>'
-            + '⚡ Consommation : <strong>' + (result.consommation_kwh||'—') + ' kWh</strong><br>'
-            + '💰 Prix/kWh : <strong>' + (result.prix_kwh||'—') + ' €</strong><br>'
-            + (result.anomalies && result.anomalies.length ? '⚠️ Anomalies : <strong>' + result.anomalies.join(', ') + '</strong>' : '✅ Aucune anomalie')
-            + '</div></div>';
+          zone.innerHTML = '<div style="padding:16px;background:rgba(163,230,53,0.06);border:1px solid rgba(163,230,53,0.2);border-radius:8px"><div style="font-size:12px;font-weight:600;color:var(--volt);margin-bottom:8px">✅ Analyse Claude terminée</div><div style="font-size:12px;color:var(--text1);line-height:1.8">📋 Fournisseur : <strong>' + (result.fournisseur||'—') + '</strong><br>📅 Période : <strong>' + (result.periode||'—') + '</strong><br>💶 Montant TTC : <strong>' + (result.montant_ttc||'—') + ' €</strong><br>⚡ Consommation : <strong>' + (result.consommation_kwh||'—') + ' kWh</strong></div></div>';
         }
         showToast('✅ Analyse terminée !');
       }
