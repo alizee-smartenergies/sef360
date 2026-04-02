@@ -23,7 +23,7 @@ async function handleDocumentUpload(input) {
       var data = await response.json();
       if (data.content && data.content[0]) {
         var text = data.content[0].text;
-        var clean = text.replace(/```json|```/g,'').trim();
+        var clean = console.log('Réponse Claude brute:', text);text.replace(/```json|```/g,'').trim();
         var result = JSON.parse(clean);
         if (currentClientId && SEF_CLIENTS[currentClientId]) {
           var c = SEF_CLIENTS[currentClientId];
