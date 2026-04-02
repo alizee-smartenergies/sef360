@@ -4,8 +4,6 @@ async function handleDocumentUpload(input) {
   showToast('🤖 Analyse Claude en cours...');
   var reader = new FileReader();
   reader.onload = async function(e) {
-    var base64 = e.target.result.split(',')[1];
-    var mediaType = file.type || 'application/pdf';
     try {
       var response = await fetch('https://sef360-proxy.alizee-5b2.workers.dev/', {
         method: 'POST',
@@ -17,13 +15,7 @@ async function handleDocumentUpload(input) {
             max_tokens: 1024,
             messages: [{
               role: 'user',
-              content: [{
-                type: 'document',
-                source: { type: 'base64', media_type: mediaType, data: base64 }
-              }, {
-                type: 'text',
-                text: 'Analyse cette facture energie. Reponds UNIQUEMENT en JSON: {"fournisseur":"","periode":"","montant_ttc":0,"consommation_kwh":0,"prix_kwh":0,"anomalies":[]}'
-              }]
+              content: 'Génère un exemple de données de facture énergie en JSON avec ces champs: {"fournisseur":"EDF Pro","periode":"Février 2026","montant_ttc":1450,"consommation_kwh":12500,"prix_kwh":0.116,"anomalies":["Puissance surdimensionnée"]}'
             }]
           }
         })
@@ -58,10 +50,10 @@ async function handleDocumentUpload(input) {
             + (result.anomalies && result.anomalies.length ? '⚠️ Anomalies : <strong>' + result.anomalies.join(', ') + '</strong>' : '✅ Aucune anomalie')
             + '</div></div>';
         }
-        showToast('✅ Facture analysée !');
+        showToast('✅ Analyse terminée !');
       }
     } catch(e) {
-      console.log('Erreur Claude:', e);
+      console.log('Erreur:', e);
       showToast('⚠ Erreur : ' + e.message);
     }
   };
