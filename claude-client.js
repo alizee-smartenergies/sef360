@@ -36,7 +36,7 @@ async function handleDocumentUpload(input) {
           $t('d-facture', c.facture);
           $t('d-conso', c.conso);
         }
-        var zone = var zone = document.getElementById('upload-result');
+        var zone = document.getElementById('upload-result');
         if (zone) {
           zone.style.display = 'block';
           zone.innerHTML = '<div style="padding:16px;background:rgba(163,230,53,0.06);border:1px solid rgba(163,230,53,0.2);border-radius:8px">'
