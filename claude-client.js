@@ -21,7 +21,7 @@ async function handleDocumentUpload(input) {
                 source: { type: 'base64', media_type: mediaType, data: base64 }
               }, {
                 type: 'text',
-                text: 'Analyse cette facture energie. Le fournisseur est le vendeur d energie (pas ENEDIS qui est le gestionnaire de reseau). Reponds UNIQUEMENT en JSON sans markdown: {"fournisseur":"","periode":"","montant_ttc":0,"consommation_kwh":0,"prix_kwh":0,"anomalies":[]}'
+                text: 'Analyse cette facture energie. Reponds UNIQUEMENT en JSON sans markdown: {"fournisseur":"","pdl":"","periode":"","date_fin_contrat":"","montant_ht":0,"montant_ttc":0,"consommation_kwh":0,"prix_kwh":0,"puissance_kva":0,"cout_abonnement":0,"cout_energie":0,"cout_taxes":0,"emissions_co2":0,"anomalies"::":[]}'
               }]
             }]
           }
