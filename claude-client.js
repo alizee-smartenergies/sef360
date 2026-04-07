@@ -36,9 +36,25 @@ async function handleDocumentUpload(input) {
         var result = JSON.parse(clean);
         if (currentClientId && SEF_CLIENTS[currentClientId]) {
           var c = SEF_CLIENTS[currentClientId];
-          if (result.montant_ttc) { c.facture = result.montant_ttc.toLocaleString('fr-FR') + ' €'; }
-          if (result.consommation_kwh) { c.conso = result.consommation_kwh.toLocaleString('fr-FR') + ' kWh'; }
-          saveClients();
+          if (currentClientId && SEF_CLIENTS[currentClientId]) {
+  var c = SEF_CLIENTS[currentClientId];
+  if (result.montant_ttc) c.facture = result.montant_ttc.toLocaleString('fr-FR') + ' €';
+  if (result.consommation_kwh) c.conso = result.consommation_kwh.toLocaleString('fr-FR') + ' kWh';
+  if (result.prix_kwh) c.prix_kwh = result.prix_kwh;
+  if (result.fournisseur) c.fournisseur = result.fournisseur;
+  if (result.pdl) c.pdl = result.pdl;
+  if (result.puissance_kva) c.puissance = result.puissance_kva;
+  if (result.emissions_co2) c.carbon = result.emissions_co2 + ' kg CO₂';
+  if (result.cout_abonnement) c.cout_abo = result.cout_abonnement;
+  if (result.date_fin_contrat) c.date_fin = result.date_fin_contrat;
+  if (result.anomalies) c.anomalies = result.anomalies;
+  saveClients();
+  var $t = function(id,v){var el=document.getElementById(id);if(el&&v)el.textContent=v;};
+  $t('d-facture', c.facture);
+  $t('d-conso', c.conso);
+  $t('d-carbon', c.carbon);
+  $t('d-fournisseur', c.fournisseur);
+}
           var el1 = document.getElementById('d-facture');
           var el2 = document.getElementById('d-conso');
           if (el1) el1.textContent = c.facture;
