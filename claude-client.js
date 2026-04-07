@@ -21,7 +21,8 @@ async function handleDocumentUpload(input) {
                 source: { type: 'base64', media_type: mediaType, data: base64 }
               }, {
                 type: 'text',
-                text: 'Analyse ce document energie (facture ou contrat). Detecte automatiquement le type. Le fournisseur est le vendeur commercial (pas ENEDIS/GRDF). Reponds UNIQUEMENT en JSON sur une seule ligne: {"type_document":"facture|contrat","fournisseur":"","pdl":"","periode":"","date_debut_contrat":"","date_fin_contrat":"","montant_ht":0,"montant_ttc":0,"consommation_kwh":0,"prix_kwh":0,"puissance_kva":0,"formule_tarifaire":"","preavis_resiliation":"","cout_abonnement":0,"cout_energie":0,"cout_taxes":0,"emissions_co2":0,"anomalies":[]}'
+                text: 'Analyse ce document energie. Le fournisseur est le vendeur commercial pas ENEDIS. Reponds en JSON une ligne: {"type_document":"facture","fournisseur":"","pdl":"","periode":"","date_fin_contrat":"","montant_ttc":0,"consommation_kwh":0,"prix_kwh":0,"puissance_kva":0,"anomalies":[]}'
+              }]
             }]
           }
         })
@@ -41,25 +42,22 @@ async function handleDocumentUpload(input) {
           if (result.fournisseur) c.fournisseur = result.fournisseur;
           if (result.pdl) c.pdl = result.pdl;
           if (result.puissance_kva) c.puissance = result.puissance_kva;
-          if (result.emissions_co2) c.carbon = result.emissions_co2 + ' kg CO₂';
-          if (result.cout_abonnement) c.cout_abo = result.cout_abonnement;
           if (result.date_fin_contrat) c.date_fin = result.date_fin_contrat;
           if (result.anomalies) c.anomalies_list = result.anomalies;
           saveClients();
-          var $t = function(id,v){var el=document.getElementById(id);if(el&&v)el.textContent=v;};
-          $t('d-facture', c.facture);$t('kpi-facture-display', c.facture);
-$t('kpi-conso-display', c.conso);
-$t('kpi-prix-display', result.prix_kwh ? result.prix_kwh.toFixed(4) + ' €/kWh' : '');
-          $t('d-conso', c.conso);
-          $t('d-carbon', c.carbon);
-          $t('d-fournisseur', c.fournisseur);
+          var t = function(id,v){var el=document.getElementById(id);if(el&&v)el.textContent=v;};
+          t('kpi-facture-display', c.facture);
+          t('kpi-conso-display', c.conso);
+          t('kpi-prix-display', result.prix_kwh ? result.prix_kwh.toFixed(4)+' €/kWh' : '');
+          t('d-facture', c.facture);
+          t('d-conso', c.conso);
         }
         var zone = document.getElementById('upload-result');
         if (zone) {
           zone.style.display = 'block';
-          zone.innerHTML = '<div style="padding:16px;background:rgba(163,230,53,0.06);border:1px solid rgba(163,230,53,0.2);border-radius:8px"><div style="font-size:12px;font-weight:600;color:var(--volt);margin-bottom:8px">✅ Analyse Claude terminée</div><div style="font-size:12px;color:var(--text1);line-height:1.8">📋 Fournisseur : <strong>' + (result.fournisseur||'—') + '</strong><br>📅 Période : <strong>' + (result.periode||'—') + '</strong><br>💶 Montant TTC : <strong>' + (result.montant_ttc||'—') + ' €</strong><br>⚡ Consommation : <strong>' + (result.consommation_kwh||'—') + ' kWh</strong><br>💰 Prix/kWh : <strong>' + (result.prix_kwh||'—') + ' €</strong><br>⚡ Puissance : <strong>' + (result.puissance_kva||'—') + ' kVA</strong><br>' + (result.anomalies && result.anomalies.length ? '⚠️ Anomalies : <strong>' + result.anomalies.join(', ') + '</strong>' : '✅ Aucune anomalie') + '</div></div>';
+          zone.innerHTML = '<div style="padding:16px;background:rgba(163,230,53,0.06);border:1px solid rgba(163,230,53,0.2);border-radius:8px"><div style="font-size:12px;font-weight:600;color:var(--volt);margin-bottom:8px">✅ Analyse Claude terminée</div><div style="font-size:12px;color:var(--text1);line-height:1.8">📋 Fournisseur : <strong>' + (result.fournisseur||'—') + '</strong><br>📅 Période : <strong>' + (result.periode||'—') + '</strong><br>💶 Montant TTC : <strong>' + (result.montant_ttc||'—') + ' €</strong><br>⚡ Consommation : <strong>' + (result.consommation_kwh||'—') + ' kWh</strong><br>💰 Prix/kWh : <strong>' + (result.prix_kwh||'—') + ' €</strong><br>⚡ Puissance : <strong>' + (result.puissance_kva||'—') + ' kVA</strong><br>' + (result.anomalies&&result.anomalies.length ? '⚠️ <strong>'+result.anomalies.join(', ')+'</strong>' : '✅ Aucune anomalie') + '</div></div>';
         }
-        showToast('✅ Facture analysée !');
+        showToast('✅ Document analysé !');
       }
     } catch(e) {
       console.log('Erreur:', e);
