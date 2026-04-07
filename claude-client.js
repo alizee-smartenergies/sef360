@@ -32,7 +32,7 @@ async function handleDocumentUpload(input) {
       if (data.content && data.content[0]) {
         var text = data.content[0].text;
         console.log('Claude text:', text);
-        var clean = text.replace(/```json|```/g,'').trim();
+      var clean = text.replace
         var result = JSON.parse(clean);
         if (currentClientId && SEF_CLIENTS[currentClientId]) {
           var c = SEF_CLIENTS[currentClientId];
