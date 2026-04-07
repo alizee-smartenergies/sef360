@@ -9,7 +9,7 @@ async function handleDocumentUpload(input) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          apiKey: CLAUDE_API_KEY,
+        
           payload: {
             model: 'claude-sonnet-4-20250514',
             max_tokens: 1024,
