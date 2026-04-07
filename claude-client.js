@@ -21,7 +21,7 @@ async function handleDocumentUpload(input) {
                 source: { type: 'base64', media_type: mediaType, data: base64 }
               }, {
                 type: 'text',
-              Analyse ce document energie (facture ou contrat). Detecte automatiquement le type. Le fournisseur est le vendeur commercial (pas ENEDIS/GRDF). Reponds UNIQUEMENT en JSON sur une seule ligne: {"type_document":"facture|contrat","fournisseur":"","pdl":"","periode":"","date_debut_contrat":"","date_fin_contrat":"","montant_ht":0,"montant_ttc":0,"consommation_kwh":0,"prix_kwh":0,"puissance_kva":0,"formule_tarifaire":"","preavis_resiliation":"","cout_abonnement":0,"cout_energie":0,"cout_taxes":0,"emissions_co2":0,"anomalies":[]}
+                text: 'Analyse ce document energie (facture ou contrat). Detecte automatiquement le type. Le fournisseur est le vendeur commercial (pas ENEDIS/GRDF). Reponds UNIQUEMENT en JSON sur une seule ligne: {"type_document":"facture|contrat","fournisseur":"","pdl":"","periode":"","date_debut_contrat":"","date_fin_contrat":"","montant_ht":0,"montant_ttc":0,"consommation_kwh":0,"prix_kwh":0,"puissance_kva":0,"formule_tarifaire":"","preavis_resiliation":"","cout_abonnement":0,"cout_energie":0,"cout_taxes":0,"emissions_co2":0,"anomalies":[]}
             }]
           }
         })
