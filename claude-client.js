@@ -33,7 +33,7 @@ async function handleDocumentUpload(input) {
         var text = data.content[0].text;
         console.log('Claude text:', text);
       var clean = text.replace
-        var result = JSON.parse(clean);
+      try { var result = JSON.parse(clean); } catch(parseErr) { console.log('Parse erreur:', parseErr.message, 'Clean:', clean); return; }
         if (currentClientId && SEF_CLIENTS[currentClientId]) {
           var c = SEF_CLIENTS[currentClientId];
           if (currentClientId && SEF_CLIENTS[currentClientId]) {
