@@ -48,7 +48,9 @@ async function handleDocumentUpload(input) {
           if (result.anomalies) c.anomalies_list = result.anomalies;
           saveClients();
           var $t = function(id,v){var el=document.getElementById(id);if(el&&v)el.textContent=v;};
-          $t('d-facture', c.facture);
+          $t('d-facture', c.facture);$t('kpi-facture-display', c.facture);
+$t('kpi-conso-display', c.conso);
+$t('kpi-prix-display', result.prix_kwh ? result.prix_kwh.toFixed(4) + ' €/kWh' : '');
           $t('d-conso', c.conso);
           $t('d-carbon', c.carbon);
           $t('d-fournisseur', c.fournisseur);
