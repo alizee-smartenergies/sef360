@@ -27,7 +27,7 @@ async function handleDocumentUpload(input) {
       if (data.content && data.content[0]) {
         var text = data.content[0].text;
         console.log("Claude text:", text);
-        var clean = text.replace(/```json|```/g,"").replace(/\n/g," ").trim();
+        var jsonMatch = text.match(/{[sS]*}/); var clean = jsonMatch ? jsonMatch[0].replace(/\n/g," ").trim() : "{}";
         var result = JSON.parse(clean);
         var isContrat = result.type_document && result.type_document.includes("contrat");
         if (currentClientId && SEF_CLIENTS[currentClientId]) {
