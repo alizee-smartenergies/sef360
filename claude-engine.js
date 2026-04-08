@@ -18,7 +18,7 @@ async function handleDocumentUpload(input) {
             max_tokens: 1024,
             messages: [{ role: "user", content: [
               { type: "document", source: { type: "base64", media_type: mediaType, data: base64 } },
-              { type: "text", text: "Analyse ce document energie. Fournisseur = vendeur commercial pas ENEDIS. JSON une ligne: {\"type_document\":\"facture\",\"fournisseur\":\"\",\"pdl\":\"\",\"periode\":\"\",\"date_fin_contrat\":\"\",\"montant_ttc\":0,\"consommation_kwh\":0,\"prix_kwh\":0,\"puissance_kva\":0,\"formule_tarifaire\":\"\",\"anomalies\":[]}" }
+              { type: "text", text: "Analyse ce document energie (facture ou contrat). IMPORTANT: le PDL electricite est un numero RAE de 14 chiffres (ex: 30001234567890), le PCE gaz est un numero de 14 chiffres aussi. Le SIRET/SIREN est different du PDL. Le fournisseur = vendeur commercial (pas ENEDIS/GRDF qui sont gestionnaires reseau). Reponds UNIQUEMENT en JSON sur une seule ligne sans markdown: {\"type_document\":\"facture\",\"energie\":\"elec\",\"fournisseur\":\"\",\"pdl_pce\":\"\",\"nom_site\":\"\",\"adresse_site\":\"\",\"periode\":\"\",\"date_debut_contrat\":\"\",\"date_fin_contrat\":\"\",\"montant_ht\":0,\"montant_ttc\":0,\"consommation_kwh\":0,\"prix_kwh\":0,\"puissance_kva\":0,\"formule_tarifaire\":\"\",\"cout_abonnement\":0,\"cout_energie\":0,\"cout_taxes\":0,\"anomalies\":[]}" }
             ]}]
           }
         })
@@ -36,7 +36,7 @@ async function handleDocumentUpload(input) {
           if (!isContrat && result.consommation_kwh) c.conso = result.consommation_kwh.toLocaleString("fr-FR") + " kWh";
           if (result.prix_kwh) c.prix_kwh = result.prix_kwh;
           if (result.fournisseur) c.fournisseur = result.fournisseur;
-          if (result.pdl) c.pdl = result.pdl;
+          if (result.pdl_pce) c.pdl = result.pdl_pce;
           if (result.puissance_kva) c.puissance = result.puissance_kva;
           if (result.date_fin_contrat) c.date_fin = result.date_fin_contrat;
           if (!c.historique) c.historique = [];
@@ -44,11 +44,11 @@ async function handleDocumentUpload(input) {
           saveClients();
 
           // Creer ou mettre a jour le PDL automatiquement
-          if (result.pdl) {
+          if (result.pdl_pce) {
             if (!c.pdls) c.pdls = [];
-            var pdlExist = c.pdls.find(function(p){return p.pdl === result.pdl;});
+            var pdlExist = c.pdls.find(function(p){return p.pdl === result.pdl_pce_pce;});
             if (!pdlExist) {
-              c.pdls.push({pdl:result.pdl,type:"elec",fournisseur:result.fournisseur||"",puissance:result.puissance_kva||0,formule:result.formule_tarifaire||"",date_fin:result.date_fin_contrat||"",prix_kwh:result.prix_kwh||0,site:""});
+              c.pdls.push({pdl:result.pdl_pce,type:"elec",fournisseur:result.fournisseur||"",puissance:result.puissance_kva||0,formule:result.formule_tarifaire||"",date_fin:result.date_fin_contrat||"",prix_kwh:result.prix_kwh||0,site:""});
               showToast("✅ PDL " + result.pdl + " ajouté !");
             } else {
               if (result.fournisseur) pdlExist.fournisseur = result.fournisseur;
