@@ -1402,6 +1402,28 @@ select{background:var(--bg3);border:1px solid var(--line2);color:var(--text0);pa
       </div>
 
 
+      <!-- ── KPIs OPTIMISATION CLIENT ── -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+        <div style="background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:14px">
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--text2);margin-bottom:6px">Coût total mensuel</div>
+          <div id="optim-cout-total" style="font-size:22px;font-weight:800;font-family:var(--mono);color:var(--elec)">—</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:14px">
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--text2);margin-bottom:6px">Puissance totale souscrite</div>
+          <div id="optim-puissance-total" style="font-size:22px;font-weight:800;font-family:var(--mono);color:var(--purple)">—</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:14px">
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--text2);margin-bottom:6px">Contrats à renouveler</div>
+          <div id="optim-contrats-urgents" style="font-size:22px;font-weight:800;font-family:var(--mono);color:var(--amber)">—</div>
+        </div>
+      </div>
+
+      <!-- ── TABLEAU PDL OPTIMISATION ── -->
+      <div style="background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:16px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text2);margin-bottom:12px">📋 Points de livraison — Analyse & Actions</div>
+        <div id="optim-pdl-zone"><div style="font-size:12px;color:var(--text2);font-style:italic">Sélectionnez un client et analysez ses factures pour voir les recommandations.</div></div>
+      </div>
+
       <!-- ── ANALYSE DE FACTURES (fusionné) ── -->
       <div style="background:rgba(56,189,248,0.02);border:1px solid rgba(56,189,248,0.12);border-radius:10px;padding:20px;margin-bottom:20px">
         <div style="font-size:9px;font-weight:700;letter-spacing:0.12em;color:var(--elec);text-transform:uppercase;margin-bottom:14px">📄 Analyse des factures — OCR & Détection d'anomalies</div>
@@ -2590,7 +2612,53 @@ function initFactures() {
   });
 }
 
-function initOptimisation() {}
+function initOptimisation() {
+  var c = (currentClientId && SEF_CLIENTS[currentClientId]) ? SEF_CLIENTS[currentClientId] : {};
+  if (!c || !c.nom) return;
+
+  // Bloc nom client
+  var els = document.querySelectorAll('.optim-client-nom');
+  els.forEach(function(el) { el.textContent = c.nom; });
+
+  // Tableau PDL optimisation
+  var zone = document.getElementById('optim-pdl-zone');
+  if (zone && c.pdls && c.pdls.length > 0) {
+    zone.innerHTML = '<table class="tbl" style="width:100%"><thead><tr>'
+      + '<th>PDL/PCE</th><th>Site</th><th>Fournisseur</th><th>Prix actuel</th>'
+      + '<th>Puissance</th><th>Fin contrat</th><th>Action</th>'
+      + '</tr></thead><tbody>'
+      + c.pdls.map(function(p) {
+          var urgence = p.date_fin && p.date_fin.includes("2025") ? "🔴 Urgent" :
+                        p.date_fin && p.date_fin.includes("2026") ? "🟡 À surveiller" : "🟢 OK";
+          var col = p.date_fin && p.date_fin.includes("2025") ? "var(--red)" :
+                    p.date_fin && p.date_fin.includes("2026") ? "var(--amber)" : "var(--green)";
+          return '<tr>'
+            + '<td style="font-family:var(--mono);font-size:11px;color:var(--elec)">' + (p.pdl||"—") + '</td>'
+            + '<td style="font-weight:600">' + (p.site||p.adresse||"—") + '</td>'
+            + '<td>' + (p.fournisseur||"—") + '</td>'
+            + '<td style="font-family:var(--mono);color:var(--purple)">' + (p.prix_kwh ? p.prix_kwh.toFixed(4)+" €/kWh" : "—") + '</td>'
+            + '<td style="font-family:var(--mono)">' + (p.puissance ? p.puissance+" kVA" : "—") + '</td>'
+            + '<td style="font-family:var(--mono);color:' + col + '">' + (p.date_fin||"—") + '</td>'
+            + '<td style="color:' + col + ';font-size:11px">' + urgence + '</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table>';
+  } else if (zone) {
+    zone.innerHTML = '<div style="font-size:12px;color:var(--text2);font-style:italic;padding:12px">Aucun PDL — analysez des factures ou contrats pour ce client.</div>';
+  }
+
+  // KPIs optimisation
+  var totalCout = c.pdls ? c.pdls.reduce(function(s,p){ return s + (p.cout_mensuel||0); }, 0) : 0;
+  var totalPuissance = c.pdls ? c.pdls.reduce(function(s,p){ return s + (p.puissance||0); }, 0) : 0;
+  var nbUrgents = c.pdls ? c.pdls.filter(function(p){ return p.date_fin && (p.date_fin.includes("2025") || p.date_fin.includes("2026")); }).length : 0;
+
+  var elCout = document.getElementById("optim-cout-total");
+  if (elCout) elCout.textContent = totalCout ? totalCout.toLocaleString("fr-FR") + " €/mois" : "—";
+  var elPuis = document.getElementById("optim-puissance-total");
+  if (elPuis) elPuis.textContent = totalPuissance ? totalPuissance + " kVA" : "—";
+  var elUrg = document.getElementById("optim-contrats-urgents");
+  if (elUrg) elUrg.textContent = nbUrgents + " contrat(s) à renouveler";
+}
 
 function initSites() {
   destroyChart('sitesChart'); destroyChart('siteDetailChart');
@@ -3431,22 +3499,37 @@ function initReporting() {
 //  AUTOPILOTE — Mise à jour selon client
 // ════════════════════════════════════════════════════════════════════
 function updateAutopilote() {
-  const c = (currentClientId && SEF_CLIENTS[currentClientId]) ? SEF_CLIENTS[currentClientId] : {};
-  if (!c || !c.nom) { return; }
-  const urgRules = (c.actions||[]).filter(a => a.prio === 'red');
-  const log1 = document.getElementById('ap-log1');
-  if (log1) log1.textContent = `Alerte EBI ${c.ebi} — Email envoyé à ${c.prenom_contact || c.nom_court}`;
-  const log2 = document.getElementById('ap-log2');
-  if (log2) log2.textContent = urgRules.length > 0 ? `Urgence : ${urgRules[0].a}` : 'Aucune urgence détectée ce mois';
-  const rule1 = document.getElementById('ap-rule1');
-  if (rule1) rule1.textContent = `EBI < 30 → Alerte achat + email (EBI actuel : ${c.ebi})`;
-  const rule2 = document.getElementById('ap-rule2');
-  if (rule2) {
-    const contratUrgent = (c.sites||[]).find(s => s.fin && s.fin.includes('2026'));
-    rule2.textContent = contratUrgent
-      ? `Contrat < 60j → Rappel + AO (${contratUrgent.nom} : expire ${contratUrgent.fin})`
-      : 'Contrat < 60j → Rappel + lancement AO (Aucun contrat urgent)';
-  }
+  var c = (currentClientId && SEF_CLIENTS[currentClientId]) ? SEF_CLIENTS[currentClientId] : {};
+  if (!c || !c.nom) return;
+
+  // Contrats urgents depuis les PDLs reels
+  var contratsUrgents = (c.pdls||[]).filter(function(p) {
+    return p.date_fin && (p.date_fin.includes("2025") || p.date_fin.includes("2026"));
+  });
+  var contratUrgent = contratsUrgents[0];
+
+  // Prix moyen
+  var prixMoyen = c.prix_kwh ? c.prix_kwh.toFixed(4) : "—";
+
+  // Logs autopilote
+  var log1 = document.getElementById("ap-log1");
+  if (log1) log1.textContent = c.facture
+    ? "Facture " + (c.fournisseur||"") + " : " + c.facture + " — " + (c.conso||"—")
+    : "Aucune facture analysée pour " + c.nom;
+
+  var log2 = document.getElementById("ap-log2");
+  if (log2) log2.textContent = contratUrgent
+    ? "⚠ Contrat " + (contratUrgent.fournisseur||"") + " expire le " + contratUrgent.date_fin + " — PDL " + (contratUrgent.pdl||"")
+    : "✅ Aucun contrat urgent détecté pour " + c.nom;
+
+  // Règles autopilote
+  var rule1 = document.getElementById("ap-rule1");
+  if (rule1) rule1.textContent = "Prix actuel " + prixMoyen + " €/kWh → " + (c.prix_kwh > 0.1 ? "Alerte prix élevé — renégociation recommandée" : "Prix dans la norme marché");
+
+  var rule2 = document.getElementById("ap-rule2");
+  if (rule2) rule2.textContent = contratUrgent
+    ? "Contrat à renouveler → " + contratUrgent.fournisseur + " (expire " + contratUrgent.date_fin + ")"
+    : "Contrat < 60j → Rappel + lancement AO (Aucun contrat urgent)";
 }
 
 
