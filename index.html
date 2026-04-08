@@ -2857,6 +2857,7 @@ function switchClient(id) {
     pdls: c.pdls || []
   };
   renderFiche();
+  setTimeout(renderPdlRepartition, 200);
 
   // KPIs dashboard — depuis données client ou vides
   var $t = function(eid, val) { var el=document.getElementById(eid); if(el) el.textContent=val; };
