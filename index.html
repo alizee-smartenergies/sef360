@@ -2886,6 +2886,39 @@ function switchClient(id) {
   renderFiche();
   setTimeout(renderPdlRepartition, 200);
 
+  // Reinitialiser graphiques et tableau pour ce client
+  var tbody = document.getElementById("factures-tbody");
+  if (tbody) {
+    if (c.historique && c.historique.length > 0) {
+      tbody.innerHTML = c.historique.map(function(h) {
+        var badge = h.type === "contrat" ? "📋" : (h.energie === "gaz" ? "🔥" : "📄");
+        var col = h.statut === "Validé" ? "#4ade80" : "#f87171";
+        return "<tr style=\"border-bottom:1px solid rgba(255,255,255,0.05)\"><td style=\"padding:8px;font-size:11px\">" + badge + " " + h.nom + "<br><span style=\"color:var(--text2);font-size:10px\">" + h.date + "</span></td><td style=\"padding:8px;font-size:11px\">" + h.fournisseur + "</td><td style=\"padding:8px;font-size:11px\">" + h.periode + "</td><td style=\"padding:8px;font-size:11px\">" + (h.montant ? h.montant.toLocaleString("fr-FR") + " €" : "—") + "</td><td style=\"padding:8px;font-size:11px\">" + (h.kwh ? h.kwh.toLocaleString("fr-FR") + " kWh" : "—") + "</td><td style=\"padding:8px;font-size:11px\">" + (h.prix_kwh ? h.prix_kwh.toFixed(4) + " €" : "—") + "</td><td style=\"padding:8px;font-size:11px;color:" + (h.anomalies > 0 ? "#f87171" : "#4ade80") + "\">" + (h.anomalies > 0 ? "⚠ " + h.anomalies : "✅") + "</td><td style=\"padding:8px\"><span style=\"font-size:10px;padding:3px 8px;border-radius:20px;background:" + (h.statut === "Validé" ? "rgba(74,222,128,0.15)" : "rgba(248,113,113,0.15)") + ";color:" + col + "\">" + h.statut + "</span></td></tr>";
+      }).join("");
+    } else {
+      tbody.innerHTML = "<tr><td colspan=\"8\" style=\"padding:12px;color:var(--text2);font-style:italic;font-size:12px\">Aucun document analysé pour ce client</td></tr>";
+    }
+  }
+
+  // Reinitialiser KPIs
+  var kpis = ["kpi-facture-display","kpi-conso-display","kpi-prix-display","kpi-budget-display"];
+  kpis.forEach(function(id) { var el = document.getElementById(id); if (el) el.textContent = "—"; });
+  if (c.facture) { var ef = document.getElementById("kpi-facture-display"); if (ef) ef.textContent = c.facture; }
+  if (c.conso) { var ec = document.getElementById("kpi-conso-display"); if (ec) ec.textContent = c.conso; }
+  if (c.prix_kwh) { var ep = document.getElementById("kpi-prix-display"); if (ep) ep.textContent = c.prix_kwh.toFixed(4) + " €/kWh"; }
+  if (c.budget_annuel) { var eb = document.getElementById("kpi-budget-display"); if (eb) eb.textContent = c.budget_annuel.toLocaleString("fr-FR") + " €"; }
+
+  // Graphiques et tableau sites
+  setTimeout(function() {
+    if (typeof _renderGraphiques === "function") _renderGraphiques(c);
+    else {
+      var canvases = ["chart-conso-mois","chart-cout-mois","chart-prix-kwh","chart-repartition"];
+      canvases.forEach(function(id) { var cv = document.getElementById(id); if (cv) cv.getContext("2d").clearRect(0,0,cv.width,cv.height); });
+      var ts = document.getElementById("tableau-sites");
+      if (ts) ts.innerHTML = "<div style=\"font-size:12px;color:var(--text2);font-style:italic\">Aucun site — analysez une facture ou un contrat.</div>";
+    }
+  }, 300);
+
   // KPIs dashboard — depuis données client ou vides
   var $t = function(eid, val) { var el=document.getElementById(eid); if(el) el.textContent=val; };
   $t('d-facture', c.facture || '—');
