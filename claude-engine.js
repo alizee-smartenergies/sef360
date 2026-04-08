@@ -24,7 +24,7 @@ async function handleDocumentUpload(input) {
         })
       });
       var data = await response.json();
-      if (data.content && data.content[0]) {
+      console.log("Data recu:", JSON.stringify(data).substring(0,200)); if (data.content && data.content[0]) {
         var text = data.content[0].text;
         console.log("Claude text:", text);
         var jsonMatch = text.match(/\{[\s\S]*\}/); var clean = jsonMatch ? jsonMatch[0].replace(/\n/g," ").trim() : "{}";
