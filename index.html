@@ -725,6 +725,33 @@ select{background:var(--bg3);border:1px solid var(--line2);color:var(--text0);pa
             </div>
           </div>
 
+          <!-- ── GRAPHIQUES ── -->
+          <div style="border-top:1px solid var(--line);padding-top:16px;margin-top:4px" id="bloc-graphiques">
+            <div style="font-size:9px;font-weight:700;letter-spacing:0.12em;color:var(--text2);text-transform:uppercase;margin-bottom:14px">📈 Analyses et Graphiques</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+              <div style="background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:12px">
+                <div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;margin-bottom:8px">Consommation 12 mois (kWh)</div>
+                <canvas id="chart-conso-mois" width="400" height="180" style="width:100%;height:180px"></canvas>
+              </div>
+              <div style="background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:12px">
+                <div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;margin-bottom:8px">Cout mensuel (euros)</div>
+                <canvas id="chart-cout-mois" width="400" height="180" style="width:100%;height:180px"></canvas>
+              </div>
+              <div style="background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:12px">
+                <div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;margin-bottom:8px">Evolution prix euros/kWh</div>
+                <canvas id="chart-prix-kwh" width="400" height="180" style="width:100%;height:180px"></canvas>
+              </div>
+              <div style="background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:12px">
+                <div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;margin-bottom:8px">Repartition Elec / Gaz</div>
+                <canvas id="chart-repartition" width="400" height="180" style="width:100%;height:180px"></canvas>
+              </div>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:12px">
+              <div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;margin-bottom:10px">Repartition par site</div>
+              <div id="tableau-sites"><div style="font-size:12px;color:var(--text2);font-style:italic">Aucun site - analysez une facture ou un contrat.</div></div>
+            </div>
+          </div>
+
           <!-- ── ZONE SAISIE (masquée) ── -->
           <div id="kpis-edit-zone" style="display:none;border-top:1px solid var(--line);padding-top:16px;margin-top:8px">
             <div style="font-size:9px;font-weight:700;letter-spacing:0.12em;color:var(--text2);text-transform:uppercase;margin-bottom:12px">✏️ Modifier les KPIs</div>
