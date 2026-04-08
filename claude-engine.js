@@ -42,6 +42,26 @@ async function handleDocumentUpload(input) {
           if (!c.historique) c.historique = [];
           c.historique.unshift({ nom: fileName, date: fileDate, type: result.type_document || "facture", fournisseur: result.fournisseur || "—", periode: result.periode || "—", montant: result.montant_ttc || 0, kwh: result.consommation_kwh || 0, prix_kwh: result.prix_kwh || 0, anomalies: result.anomalies ? result.anomalies.length : 0, statut: result.anomalies && result.anomalies.length > 0 ? "Anomalie" : "Validé" });
           saveClients();
+
+          // Creer ou mettre a jour le PDL automatiquement
+          if (result.pdl) {
+            if (!c.pdls) c.pdls = [];
+            var pdlExist = c.pdls.find(function(p){return p.pdl === result.pdl;});
+            if (!pdlExist) {
+              c.pdls.push({pdl:result.pdl,type:"elec",fournisseur:result.fournisseur||"",puissance:result.puissance_kva||0,formule:result.formule_tarifaire||"",date_fin:result.date_fin_contrat||"",prix_kwh:result.prix_kwh||0,site:""});
+              showToast("✅ PDL " + result.pdl + " ajouté !");
+            } else {
+              if (result.fournisseur) pdlExist.fournisseur = result.fournisseur;
+              if (result.puissance_kva) pdlExist.puissance = result.puissance_kva;
+              if (result.formule_tarifaire) pdlExist.formule = result.formule_tarifaire;
+              if (result.date_fin_contrat) pdlExist.date_fin = result.date_fin_contrat;
+              if (result.prix_kwh) pdlExist.prix_kwh = result.prix_kwh;
+              showToast("✅ PDL " + result.pdl + " mis à jour !");
+            }
+            saveClients();
+            var pdlCountEl = document.querySelector(".client-pdl-count");
+            if (pdlCountEl) pdlCountEl.textContent = c.pdls.length + " PDL/PCE";
+          }
           var t = function(id,v){var el=document.getElementById(id);if(el&&v)el.textContent=v;};
           if (!isContrat) { t("kpi-facture-display",c.facture); t("kpi-conso-display",c.conso); t("d-facture",c.facture); t("d-conso",c.conso); } t("kpi-prix-display", result.prix_kwh ? String(result.prix_kwh.toFixed(4))+" €/kWh" : ""); t("rp-prix", result.prix_kwh ? String(result.prix_kwh.toFixed(4))+" €/kWh" : "");
           
