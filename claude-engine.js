@@ -43,8 +43,8 @@ async function handleDocumentUpload(input) {
           c.historique.unshift({ nom: fileName, date: fileDate, type: result.type_document || "facture", fournisseur: result.fournisseur || "—", periode: result.periode || "—", montant: result.montant_ttc || 0, kwh: result.consommation_kwh || 0, prix_kwh: result.prix_kwh || 0, anomalies: result.anomalies ? result.anomalies.length : 0, statut: result.anomalies && result.anomalies.length > 0 ? "Anomalie" : "Validé" });
           saveClients();
           var t = function(id,v){var el=document.getElementById(id);if(el&&v)el.textContent=v;};
-          if (!isContrat) { t("kpi-facture-display",c.facture); t("kpi-conso-display",c.conso); t("d-facture",c.facture); t("d-conso",c.conso); }
-          t("kpi-prix-display", result.prix_kwh ? result.prix_kwh.toFixed(4)+" €/kWh" : "");
+          if (!isContrat) { t("kpi-facture-display",c.facture); t("kpi-conso-display",c.conso); t("d-facture",c.facture); t("d-conso",c.conso); } t("kpi-prix-display", result.prix_kwh ? String(result.prix_kwh.toFixed(4))+" €/kWh" : ""); t("rp-prix", result.prix_kwh ? String(result.prix_kwh.toFixed(4))+" €/kWh" : "");
+          
           var tbody = document.getElementById("factures-tbody");
           if (tbody && c.historique) {
             tbody.innerHTML = c.historique.map(function(h) {
