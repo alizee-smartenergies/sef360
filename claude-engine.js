@@ -56,7 +56,7 @@ async function handleDocumentUpload(input) {
               if (result.formule_tarifaire) pdlExist.formule = result.formule_tarifaire;
               if (result.date_fin_contrat) pdlExist.date_fin = result.date_fin_contrat;
               if (result.prix_kwh) pdlExist.prix_kwh = result.prix_kwh;
-              showToast("✅ PDL " + result.pdl + " mis à jour !");
+              showToast("✅ PDL " + result.pdl_pce + " mis à jour !");
             }
             saveClients();
             var pdlCountEl = document.querySelector(".client-pdl-count");
