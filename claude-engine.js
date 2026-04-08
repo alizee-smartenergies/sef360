@@ -28,7 +28,7 @@ async function handleDocumentUpload(input) {
         var text = data.content[0].text;
         console.log("Claude text:", text);
         var jsonMatch = text.match(/\{[\s\S]*\}/); var clean = jsonMatch ? jsonMatch[0].replace(/\n/g," ").trim() : "{}";
-        var result = JSON.parse(clean);
+        var result = JSON.parse(clean); console.log("Result parsed:", result);
         var isContrat = result.type_document && result.type_document.includes("contrat");
         if (currentClientId && SEF_CLIENTS[currentClientId]) {
           var c = SEF_CLIENTS[currentClientId];
