@@ -2978,14 +2978,10 @@ function switchClient(id) {
 
   // Graphiques et tableau sites
   setTimeout(function() {
-    if (typeof _renderGraphiques === "function") _renderGraphiques(c);
-    else {
-      var canvases = ["chart-conso-mois","chart-cout-mois","chart-prix-kwh","chart-repartition"];
-      canvases.forEach(function(id) { var cv = document.getElementById(id); if (cv) cv.getContext("2d").clearRect(0,0,cv.width,cv.height); });
-      var ts = document.getElementById("tableau-sites");
-      if (ts) ts.innerHTML = "<div style=\"font-size:12px;color:var(--text2);font-style:italic\">Aucun site — analysez une facture ou un contrat.</div>";
+    if (typeof _renderGraphiques === "function") {
+      _renderGraphiques(c);
     }
-  }, 300);
+  }, 400);
 
   // KPIs dashboard — depuis données client ou vides
   var $t = function(eid, val) { var el=document.getElementById(eid); if(el) el.textContent=val; };
