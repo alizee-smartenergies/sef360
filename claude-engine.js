@@ -130,8 +130,11 @@ function _renderGraphiques(c) {
   var couts = derniers.map(function(m) { return m.montant; });
   var prix = derniers.map(function(m) { return m.prix_kwh; });
   _drawBarChart("chart-conso-mois", labels, consos, "#38bdf8", "kWh");
+  _drawBarChart("chart-conso-mois-main", labels, consos, "#38bdf8", "kWh");
   _drawLineChart("chart-cout-mois", labels, couts, "#a3e635", "€");
+  _drawLineChart("chart-cout-mois-main", labels, couts, "#a3e635", "€");
   _drawLineChart("chart-prix-kwh", labels, prix, "#c084fc", "€/kWh");
+  _drawLineChart("chart-prix-kwh-main", labels, prix, "#c084fc", "€/kWh");
   var totalElec = elec.reduce(function(s, m) { return s + m.montant; }, 0);
   var totalGaz = gaz.reduce(function(s, m) { return s + m.montant; }, 0);
   _drawDonut("chart-repartition", totalElec, totalGaz);
