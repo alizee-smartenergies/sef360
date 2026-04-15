@@ -223,12 +223,11 @@ function _drawDonut(canvasId, elec, gaz) {
 function _renderTableSites(c) {
   var el = document.getElementById("tableau-sites");
   if (!el || !c.pdls || c.pdls.length === 0) return;
-  el.innerHTML = "<table class=\"tbl\" style=\"width:100%\"><thead><tr><th>Site</th><th>PDL/PCE</th><th>Énergie</th><th>Fournisseur</th><th>Puissance</th><th>Prix €/kWh</th><th>Coût/mois</th><th>Fin contrat</th></tr></thead><tbody>"
-    + c.pdls.map(function(p) {
+  el.innerHTML = c.pdls.map(function(p) {
         var col = p.type === "elec" ? "var(--elec)" : "var(--gaz)";
         var danger = p.date_fin && p.date_fin.includes("2026") ? "var(--red)" : "var(--green)";
         return "<tr><td style=\"font-weight:600\">" + (p.site || p.adresse || "—") + "</td><td style=\"font-family:var(--mono);font-size:11px;color:" + col + "\">" + (p.pdl||"—") + "</td><td style=\"color:" + col + "\">" + (p.type==="elec" ? "⚡ Élec" : "🔥 Gaz") + "</td><td>" + (p.fournisseur||"—") + "</td><td style=\"font-family:var(--mono)\">" + (p.puissance ? p.puissance+" kVA" : "—") + "</td><td style=\"font-family:var(--mono);color:var(--purple)\">" + (p.prix_kwh ? p.prix_kwh.toFixed(4)+" €" : "—") + "</td><td style=\"font-family:var(--mono);color:var(--elec)\">" + (p.cout_mensuel ? p.cout_mensuel.toLocaleString("fr-FR")+" €" : "—") + "</td><td style=\"font-family:var(--mono);color:" + danger + "\">" + (p.date_fin||"—") + "</td></tr>";
-      }).join("") + "</tbody></table>";
+      }).join("");
 }
 
 function _renderUploadResult(result, fileName, isContrat) {
