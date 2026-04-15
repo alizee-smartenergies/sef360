@@ -24,7 +24,7 @@ async function handleDocumentUpload(input) {
             max_tokens: 2048,
             messages: [{ role: "user", content: [
               { type: "document", source: { type: "base64", media_type: mediaType, data: base64 } },
-              { type: "text", text: "Analyse ce document energie (facture ou contrat). IMPORTANT: le PDL electricite est un numero RAE de 14 chiffres (ex: 30001234567890), le PCE gaz est un numero de 14 chiffres. Le SIRET/SIREN est different du PDL. Le fournisseur = vendeur commercial (pas ENEDIS/GRDF qui sont gestionnaires reseau). Pour la periode d'une facture, extrait le mois et l'annee au format MM/AAAA. Reponds UNIQUEMENT en JSON sur une seule ligne sans markdown: {\"type_document\":\"facture\",\"energie\":\"elec\",\"fournisseur\":\"\",\"pdl_pce\":\"\",\"nom_site\":\"\",\"adresse_site\":\"\",\"periode\":\"\",\"mois\":0,\"annee\":0,\"date_debut_contrat\":\"\",\"date_fin_contrat\":\"\",\"montant_ht\":0,\"montant_ttc\":0,\"consommation_kwh\":0,\"consommation_mwh\":0,\"prix_kwh\":0,\"puissance_kva\":0,\"formule_tarifaire\":\"\",\"cout_abonnement\":0,\"cout_energie\":0,\"cout_taxes\":0,\"budget_annuel_estime\":0,\"anomalies\":[]}" }
+              { type: "text", text: "Analyse ce document energie. REGLES IMPORTANTES: (1) type_document = facture si cest une facture/releve de consommation avec un montant TTC a payer, contrat si cest un contrat/accord commercial sans montant a payer. (2) Le PDL electricite est un numero RAE de 14 chiffres commencant par 3 (ex: 30001234567890). Le PCE gaz commence par 0. Le SIRET est different du PDL. (3) fournisseur = vendeur commercial uniquement (jamais ENEDIS, GRDF, RTE). (4) Pour une FACTURE: extrait mois et annee de la periode de consommation (pas date emission). prix_kwh = prix unitaire HT en euros (ex: 0.0455 et non 4.55). (5) Pour un CONTRAT: mois=0, annee=0, montant_ht=0, montant_ttc=0. prix_kwh = prix contractuel unitaire HT en euros. Reponds UNIQUEMENT en JSON sur une seule ligne sans markdown: {\"type_document\":\"facture\",\"energie\":\"elec\",\"fournisseur\":\"\",\"pdl_pce\":\"\",\"nom_site\":\"\",\"adresse_site\":\"\",\"periode\":\"\",\"mois\":0,\"annee\":0,\"date_debut_contrat\":\"\",\"date_fin_contrat\":\"\",\"montant_ht\":0,\"montant_ttc\":0,\"consommation_kwh\":0,\"consommation_mwh\":0,\"prix_kwh\":0,\"puissance_kva\":0,\"formule_tarifaire\":\"\",\"cout_abonnement\":0,\"cout_energie\":0,\"cout_taxes\":0,\"budget_annuel_estime\":0,\"anomalies\":[]}" }
             ]}]
           }
         })
@@ -48,8 +48,9 @@ async function handleDocumentUpload(input) {
             if (result.consommation_kwh) c.conso = result.consommation_kwh.toLocaleString("fr-FR") + " kWh";
             if (result.montant_ttc) c.budget_annuel = result.budget_annuel_estime || (result.montant_ttc * 12);
           }
-          if (result.prix_kwh) c.prix_kwh = result.prix_kwh;
-          if (result.fournisseur) c.fournisseur = result.fournisseur;
+          // Contrat : ne pas ecraser les donnees de facturation existantes
+          if (result.prix_kwh && (!isContrat || !c.prix_kwh)) c.prix_kwh = result.prix_kwh;
+          if (result.fournisseur && (!isContrat || !c.fournisseur)) c.fournisseur = result.fournisseur;
           if (result.pdl_pce) c.pdl = result.pdl_pce;
           if (result.puissance_kva) c.puissance = result.puissance_kva;
           if (result.date_fin_contrat) c.date_fin = result.date_fin_contrat;
